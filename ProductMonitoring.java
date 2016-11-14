@@ -7,26 +7,43 @@ public class ProductMonitoring {
 
 	public static void main(String[] args) {
 		try {
+			// Load JSON Data
 			String jsonData = readFile("run_results.json");
 			JSONObject obj = new JSONObject(jsonData);
-			String ASIN = obj.getString("search_bar");
-			String sellersUrl = obj.getString("sellers_link");
-			JSONArray companies = obj.getJSONArray("companyName");
-			Product p1 = new Product(ASIN, sellersUrl, Country.deduceFromUrl(sellersUrl), 0.0);
 
-			System.err.println(p1);
+			// Initalize products container
+			ArrayList<Product> products = new ArrayList<Product>();
 			
-			for (int i = 0; i < companies.length(); i++)	{
-				String companyName = companies.getJSONObject(i).getString("name");
-				String sellerUrl = companies.getJSONObject(i).getString("url");
-				String price = companies.getJSONObject(i).getString("price");
-				String expFrom = companies.getJSONObject(i).getString("expFrom");
+			// Parse JSON Data for each product
+			JSONArray jsonProducts = obj.getJSONArray("products");
+			for (int i = 0; i < jsonProducts.length(); i++) {
+				String name = jsonProducts.getJSONObject(i).getString("name");
+				String asin = jsonProducts.getJSONObject(i).getString("ASIN");
+				String offersUrl = jsonProducts.getJSONObject(i).getString("offers_url");
+
+				Product p1 = new Product(name, asin, offersUrl, Country.deduceFromUrl(offersUrl), 0.0);
+				products.add(p1);
+				
+				JSONArray offers = jsonProducts.getJSONObject(i).getJSONArray("offers");
+				for (int j = 0; j < offers.length(); j++)	{
+					String companyName = offers.getJSONObject(j).getString("name");
+					String companyUrl = offers.getJSONObject(j).getString("url");
+					String price = offers.getJSONObject(j).getString("price");
+					String expFrom = offers.getJSONObject(j).getString("expFrom");
+
+					Offer co = new Offer(companyName, companyUrl, Country.expFromStringToCountry(expFrom), price);
+					p1.offers.add(co);
+				}
+
 			}
+
+			printAllProducts(products);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 	}
 
+	//! Converts file at path filename into a String
 	public static String readFile(String filename) {
 		String result = "";
 		try {
@@ -42,5 +59,11 @@ public class ProductMonitoring {
 			e.printStackTrace();
 		}
 		return result;
+	}
+
+	public static void printAllProducts(ArrayList<Product> products) {
+		for (Product p : products) {
+			System.out.println(p);
+		}
 	}
 }
