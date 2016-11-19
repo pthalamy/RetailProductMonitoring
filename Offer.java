@@ -23,7 +23,7 @@ public class Offer {
 	}
 
 	public void printCSDescription() {
-		System.out.println("\tCS Offer: " + companyName + "; From: " + country + "; price: " + price);
+		System.out.println("\tOffer: " + companyName + "; From: " + country + "; price: " + price);
 	}
 	
 	@Override

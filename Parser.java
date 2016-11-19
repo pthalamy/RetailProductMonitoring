@@ -3,6 +3,7 @@ import org.jsoup.*;
 import org.jsoup.nodes.*;
 import org.jsoup.select.*;
 import java.net.URL;
+import java.io.*;
 
 public class Parser {
 
@@ -16,15 +17,20 @@ public class Parser {
 		this.url = getProductPageFromASIN(asin);
 	}
 
-    public Product parseProduct() {
+    public Product parseProduct() throws Exception {
 		Product p = null;
 		
 		try {
 			// Retrieve product offers page
-			Document doc = Jsoup.connect(this.url).timeout(30000).userAgent("Mozilla/17.0").get();
+			Document doc = Jsoup.connect(this.url).timeout(30000).userAgent("Safari/602.2.14").get();
 
 			// Get missing product information and initialize product
 			Elements h1 = doc.getElementsByTag("h1");
+			if (h1.isEmpty()) {
+				System.err.println("error: parsing is currently blocked by the Amazon Servers, please change your ip address");
+				System.exit(1);
+			}
+			
 			String productName = h1.first().text();
 
 			p = new Product(productName, asin, url, country);
@@ -35,7 +41,7 @@ public class Parser {
 				p.offers.add(parseOffer(offer));
 			}
 			
-		} catch (Exception e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		

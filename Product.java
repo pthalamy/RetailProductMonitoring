@@ -19,8 +19,8 @@ public class Product {
 	}
 
 	public void printCSDescription() {
-		System.out.println("\tCS Product: " + name + "; ASIN: " + ASIN + "; From: " + country + "; price: " + retailPrice);
-		System.out.println("\tCS URL: " + url);		
+		System.out.println("\tProduct: " + name + "; ASIN: " + ASIN + "; Store: " + country + "; price: " + retailPrice);
+		System.out.println("\tURL: " + url);		
 	}
 
 	public void setRetailPrice(Double price) {
