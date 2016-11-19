@@ -14,11 +14,18 @@ public class Offer {
 		this.price = offerPriceFromString(priceStr);
 	}
 
-	//! TODO
+	//! Ensure it works for all cases
 	public static Double offerPriceFromString(String priceStr) {
-		return 0.0;
+		int priceStartIndex = priceStr.indexOf("EUR ") + "EUR ".length();
+		String wellFormattedPrice = priceStr.substring(priceStartIndex).replace(",", ".");
+		
+		return Double.valueOf(wellFormattedPrice);
 	}
 
+	public void printCSDescription() {
+		System.out.println("\tCS Offer: " + companyName + "; From: " + country + "; price: " + price);
+	}
+	
 	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer();

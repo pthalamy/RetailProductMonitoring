@@ -44,8 +44,39 @@ public enum Country {
 		}
 	}
 
-	// #TODO
+	// Ensure it works for all cases
+	//  Input format: "*: <Country>."
 	public static Country expFromStringToCountry(String expFrom) {
-		return OTHER;
+		//  Position here  "*: <Country>."
+		//                     ^
+		//                     |
+		int countryIndex = expFrom.lastIndexOf(":") + ": ".length();
+
+		// Trim to <Country>
+		String countryString = expFrom.substring(countryIndex, expFrom.length() - 1).trim();		
+		
+		switch(countryString) {
+		case "Italia": return ITALY;
+		case "France": return FRANCE;
+		case "Germany": return GERMANY;
+		case "United Kingdom": return UK;
+		default:
+			System.err.println("warning: unknown country: " + countryString);
+			return OTHER;
+		}
 	}
+
+	// Returns domain extension corresponding to this instance of Country
+	public String getExtension() {
+		switch(this) {
+		case ITALY: return "it";
+		case FRANCE: return "fr";
+		case GERMANY: return "de";
+		case UK: return "co.uk";
+		default:
+			System.err.println("error: Country.getExtension(): unknown country.");
+			return "ERROR";
+		}
+	}
+
 }

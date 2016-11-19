@@ -1,64 +1,59 @@
 
-import org.json.*;
+// import org.json.*;
 import java.util.*;
 import java.io.*;
 
 public class ProductMonitoring {
 
+    HashMap<String, Double> productASINList = new HashMap<String, Double>();
+
+	public ProductMonitoring() {
+		super();
+	}
+	
+	// TODO: Support other websites than amazon.it
 	public static void main(String[] args) {
-		try {
-			// Load JSON Data
-			String jsonData = readFile("run_results.json");
-			JSONObject obj = new JSONObject(jsonData);
-
-			// Initalize products container
-			ArrayList<Product> products = new ArrayList<Product>();
-			
-			// Parse JSON Data for each product
-			JSONArray jsonProducts = obj.getJSONArray("products");
-			for (int i = 0; i < jsonProducts.length(); i++) {
-				String name = jsonProducts.getJSONObject(i).getString("name");
-				String asin = jsonProducts.getJSONObject(i).getString("ASIN");
-				String offersUrl = jsonProducts.getJSONObject(i).getString("offers_url");
-
-				Product p1 = new Product(name, asin, offersUrl, Country.deduceFromUrl(offersUrl), 0.0);
-				products.add(p1);
-				
-				JSONArray offers = jsonProducts.getJSONObject(i).getJSONArray("offers");
-				for (int j = 0; j < offers.length(); j++)	{
-					String companyName = offers.getJSONObject(j).getString("name");
-					String companyUrl = offers.getJSONObject(j).getString("url");
-					String price = offers.getJSONObject(j).getString("price");
-					String expFrom = offers.getJSONObject(j).getString("expFrom");
-
-					Offer co = new Offer(companyName, companyUrl, Country.expFromStringToCountry(expFrom), price);
-					p1.offers.add(co);
-				}
-
-			}
-
-			printAllProducts(products);
-		} catch (JSONException e) {
-			e.printStackTrace();
+		ProductMonitoring pm = new ProductMonitoring();
+		ArrayList<Product> products = new ArrayList<Product>();
+		pm.initializeProductASINList();
+		
+		for (String asin : pm.productASINList.keySet()) {
+			Parser parser = new Parser(asin, Country.ITALY);
+			Product p = parser.parseProduct();
+			p.setRetailPrice(pm.productASINList.get(p.ASIN));
+			products.add(p);
 		}
+
+		// printAllProducts(products);
+		
+		if (performCrossSellingCheck(products))
+			System.out.println("\nNo cross-selling detected.");
+		else
+			System.out.println("\nCross-selling detected, check above.");
 	}
 
-	//! Converts file at path filename into a String
-	public static String readFile(String filename) {
-		String result = "";
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(filename));
-			StringBuilder sb = new StringBuilder();
-			String line = br.readLine();
-			while (line != null) {
-				sb.append(line);
-				line = br.readLine();
+	// Return true if a cross selling offer was detected, false otherwise
+	public static boolean performCrossSellingCheck(ArrayList<Product> products) {
+		boolean CSDetected = false;
+			
+		// Check cross-selling for each product
+		for (Product p : products) {
+			for (Offer o : p.offers) {
+				if (!p.country.equals(o.country)) {
+				    CSDetected = true;
+					reportCS(p, o);
+				}					
 			}
-			result = sb.toString();
-		} catch(Exception e) {
-			e.printStackTrace();
 		}
-		return result;
+
+		return CSDetected;
+	}
+
+	public static void reportCS(Product p, Offer o) {
+		System.out.println("CS Report:");
+		p.printCSDescription();
+		o.printCSDescription();
+		System.out.println("");
 	}
 
 	public static void printAllProducts(ArrayList<Product> products) {
@@ -66,4 +61,15 @@ public class ProductMonitoring {
 			System.out.println(p);
 		}
 	}
+
+	public void initializeProductASINList() {
+		// Bowers & Wilkins
+		this.productASINList.put("B00BK7PNIG", 191.0);
+		this.productASINList.put("B00NOOWVCE", 254.0);
+		this.productASINList.put("B00Y0Q9LFU", 339.0);
+		this.productASINList.put("B016JZZBPS", 594.0);
+		this.productASINList.put("B00OLE9606", 296.0);
+		this.productASINList.put("B003II3BM0", 424.0);
+
+	}	
 }

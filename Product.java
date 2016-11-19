@@ -9,16 +9,24 @@ public class Product {
 	public Double retailPrice;
 	public ArrayList<Offer> offers = new ArrayList<Offer>();
 	
-	public Product(String name, String ASIN, String url, Country country, Double price) {
+	public Product(String name, String ASIN, String url, Country country) {
 		super();
 
 		this.name = name;
 		this.ASIN = ASIN;
 		this.url = url;
 		this.country = country;
-		this.retailPrice = price;
 	}
 
+	public void printCSDescription() {
+		System.out.println("\tCS Product: " + name + "; ASIN: " + ASIN + "; From: " + country + "; price: " + retailPrice);
+		System.out.println("\tCS URL: " + url);		
+	}
+
+	public void setRetailPrice(Double price) {
+		this.retailPrice = price;
+	}
+	
 	@Override
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
