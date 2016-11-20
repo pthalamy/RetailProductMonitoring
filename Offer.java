@@ -15,6 +15,7 @@ public class Offer {
 	}
 
 	//! Ensure it works for all cases
+	//! "EUR 1.234,45" -> 1234.45
 	public static Double offerPriceFromString(String priceStr) {
 		String wellFormattedPrice = "";
 		int priceStartIndex;

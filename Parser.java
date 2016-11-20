@@ -98,7 +98,6 @@ public class Parser {
 			} else {
 				expeditionCountry = Country.expFromStringToCountry(expFromString, store);
 			}
-
 		}
 
 		Elements prices = offer.getElementsByClass("olpOfferPrice");

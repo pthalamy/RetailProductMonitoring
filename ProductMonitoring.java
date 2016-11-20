@@ -12,7 +12,6 @@ public class ProductMonitoring {
 		super();
 	}
 	
-	// TODO: Support other websites than amazon.it
 	public static void main(String[] args) {
 		ProductMonitoring pm = new ProductMonitoring();
 		pm.initializeProductASINList();
@@ -129,7 +128,6 @@ public class ProductMonitoring {
 		this.productASINList.put("B007Y3OC50", 296.0);
 		this.productASINList.put("B00ENI4QJG", 1189.0);
 		this.productASINList.put("B00ENI4QTQ", 1189.0);
-		this.productASINList.put("B00APWG3KE", 1954.0);
 		this.productASINList.put("B007Y3OBAQ", 211.0);
 		this.productASINList.put("B007Y3OBF6", 211.0);
 		this.productASINList.put("B007Y3OBIS", 296.0);
@@ -137,7 +135,6 @@ public class ProductMonitoring {
 		this.productASINList.put("B00EUV4YRK", 1189.0);
 		this.productASINList.put("B00EUV4YJI", 1189.0);
 		this.productASINList.put("B00EUV4YJI", 1189.0);
-		this.productASINList.put("B00EUV4YJI", 1954.0);
 		this.productASINList.put("B01GQ85GW6", 509.0);
 		this.productASINList.put("B01GQ85GLW", 636.0);
 		this.productASINList.put("B01GQ85GIU", 934.0);
