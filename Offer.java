@@ -25,7 +25,7 @@ public class Offer {
 			wellFormattedPrice = priceStr.substring(priceStartIndex).replace(".", "").replace(",", ".");
 		} else if (priceStr.contains("£")) {
 		    priceStartIndex = priceStr.indexOf("£") + "£".length();
-			wellFormattedPrice = priceStr.substring(priceStartIndex).replace(".", "").replace(",", ".");
+			wellFormattedPrice = priceStr.substring(priceStartIndex).replace(",", "");
 		} else {
 			System.err.println("error: offerPriceFromString: unsupported input price string " + priceStr);
 			System.exit(1);
