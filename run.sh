@@ -20,7 +20,7 @@ if [ ! -f jsoup-1.10.1.jar ]; then
 fi
 
 # Compile
-javac -cp .:jsoup-1.10.1.jar ProductMonitoring.java
+javac -cp .:jsoup-1.10.1.jar ProductMonitoring.java -encoding UTF8
 if [ $? -eq 0 ]; then
     echo "Compilation Successful" >&2;
 else
@@ -34,4 +34,4 @@ fi
 #      2> /dev/null | gunzip > run_results.json 
 
 # Run
-java -cp .:jsoup-1.10.1.jar ProductMonitoring
+java -cp .:jsoup-1.10.1.jar ProductMonitoring -encoding UTF8

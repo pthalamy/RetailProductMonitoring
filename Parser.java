@@ -9,11 +9,11 @@ public class Parser {
 
 	private final String asin;
 	private String url;
-	private Country country;
+	private Country store;
 	
-	public Parser (String asin, Country country) {
+	public Parser (String asin, Country store) {
 		this.asin = asin;
-		this.country = country;
+		this.store = store;
 		this.url = getProductPageFromASIN(asin);
 	}
 
@@ -22,7 +22,10 @@ public class Parser {
 		
 		try {
 			// Retrieve product offers page
-			Document doc = Jsoup.connect(this.url).timeout(30000).userAgent("Safari/602.2.14").get();
+			Document doc = Jsoup.connect(this.url)
+				.timeout(30000)
+				.userAgent(RandomUserAgent.getRandomUserAgent())
+				.get();
 
 			// Get missing product information and initialize product
 			Elements h1 = doc.getElementsByTag("h1");
@@ -33,10 +36,15 @@ public class Parser {
 			
 			String productName = h1.first().text();
 
-			p = new Product(productName, asin, url, country);
+			p = new Product(productName, asin, url, store);
 
 			// Parse and instantiate offers
 			Elements offers = doc.getElementsByClass("olpOffer");
+			if (offers.isEmpty()) {
+				// No offer for product
+				return null;
+			}
+				
 			for (Element offer : offers) {
 				p.offers.add(parseOffer(offer));
 			}
@@ -60,8 +68,8 @@ public class Parser {
 
 		Country expeditionCountry;				
 		if (companyName.equals("")) { // This must be amazon offer
-			companyName = "Amazon." + this.country.getExtension();
-			expeditionCountry = this.country;
+			companyName = "Amazon." + this.store.getExtension();
+			expeditionCountry = this.store;
 		} else {
 			// Find expedition information among offer information
 			Elements offerInfos = offer.getElementsByClass("a-list-item");
@@ -69,16 +77,28 @@ public class Parser {
 						
 			for (Element item : offerInfos) {
 				String text = item.text();
-				if (text.contains("Spedizione")) {
+				if (text.contains("Spedizione da")
+					|| text.contains("Expédié depuis")
+					|| text.contains("Versand aus")
+					|| text.contains("Dispatched from")) {
 					expFromString = text;
 					break;
 				}
 			}
 
-			if (expFromString.equals(""))
-				System.err.println("error: Missing expedition information!");
+			if (expFromString.equals("")) {
+				Elements fulfilledByAmazon = offer.getElementsByClass("a-popover-trigger a-declarative olpFbaPopoverTrigger");
+				if (fulfilledByAmazon.isEmpty()) {
+					System.err.println("error: Missing dispatch information!" + "\n\turl: " + url);
+					expeditionCountry  = Country.OTHER;
+				} else {
+					// Product is shipped by Amazon
+					expeditionCountry  = this.store;
+				}
+			} else {
+				expeditionCountry = Country.expFromStringToCountry(expFromString, store);
+			}
 
-			expeditionCountry = Country.expFromStringToCountry(expFromString);
 		}
 
 		Elements prices = offer.getElementsByClass("olpOfferPrice");
@@ -89,7 +109,7 @@ public class Parser {
 	
 	public String getProductPageFromASIN(String asin) {
 		return "https://www.amazon."
-			+ this.country.getExtension()
+			+ this.store.getExtension()
 			+ "/gp/offer-listing/"
 			+ asin
 			+ "/ref=dp_olp_new?ie=UTF8&condition=new";

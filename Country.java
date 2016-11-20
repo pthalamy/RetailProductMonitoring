@@ -46,20 +46,67 @@ public enum Country {
 
 	// Ensure it works for all cases
 	//  Input format: "*: <Country>."
-	public static Country expFromStringToCountry(String expFrom) {
-		//  Position here  "*: <Country>."
-		//                     ^
-		//                     |
-		int countryIndex = expFrom.lastIndexOf(":") + ": ".length();
+	public static Country expFromStringToCountry(String expFrom, Country store) {
+		int countryStartIndex = 0;
+		int countryEndIndex = 0;
+		
+		switch(store) {
+		case ITALY: ;
+			//  Position here  "Spedizione da: <Country>."
+			//                     ^
+			//                     |
+			countryStartIndex = expFrom.lastIndexOf(":") + ": ".length();
+			countryEndIndex = expFrom.length() - 1;
+			break;
+		case FRANCE:
+			//  Position here  "Expédié depuis <Country>."
+			//                                 ^
+			//                                 |
+			countryStartIndex = expFrom.lastIndexOf("Expédié depuis ") + "Expédié depuis ".length();
+			countryEndIndex = expFrom.length() - 1;
+			break;
+		case GERMANY: 
+			//  Position here  "Versand aus <Country>."
+			//                              ^
+			//                              |
+			countryStartIndex = expFrom.lastIndexOf("Versand aus ") + "Versand aus ".length();
+			countryEndIndex = expFrom.length();
+			break;
+		case UK: 
+			//  Position here  "Dispatched from <Country>."
+			//                              ^
+			//                              |
+			countryStartIndex = expFrom.lastIndexOf("Dispatched from ") + "Dispatched from ".length();
+			countryEndIndex = expFrom.length() - 1;
+			break;
+		default:
+			System.err.println("error: expFromStringToCountry: unknown store: " + store);
+			System.exit(1);
+		}
+
 
 		// Trim to <Country>
-		String countryString = expFrom.substring(countryIndex, expFrom.length() - 1).trim();		
+		String countryString = expFrom.substring(countryStartIndex, countryEndIndex).trim();		
+		// System.out.println(expFrom + " -> " + countryString);
 		
 		switch(countryString) {
-		case "Italia": return ITALY;
-		case "France": return FRANCE;
-		case "Germany": return GERMANY;
-		case "United Kingdom": return UK;
+		case "Italia":
+		case "Italie":
+		case "Italy":
+		case "Italien":
+			return ITALY;
+		case "France":
+		case "Francia":
+			return FRANCE;
+		case "Germany":
+		case "Deutschland":
+		case "Allemagne":
+		case "Germania":
+			return GERMANY;
+		case "United Kingdom":
+		case "Vereinigtes Königreich":
+		case "Regno Unito":
+			return UK;
 		default:
 			System.err.println("warning: unknown country: " + countryString);
 			return OTHER;

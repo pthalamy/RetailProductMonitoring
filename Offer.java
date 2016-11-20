@@ -16,8 +16,19 @@ public class Offer {
 
 	//! Ensure it works for all cases
 	public static Double offerPriceFromString(String priceStr) {
-		int priceStartIndex = priceStr.indexOf("EUR ") + "EUR ".length();
-		String wellFormattedPrice = priceStr.substring(priceStartIndex).replace(",", ".");
+		String wellFormattedPrice = "";
+		int priceStartIndex;
+		
+		if (priceStr.contains("EUR")) {
+			priceStartIndex = priceStr.indexOf("EUR ") + "EUR ".length();
+			wellFormattedPrice = priceStr.substring(priceStartIndex).replace(".", "").replace(",", ".");
+		} else if (priceStr.contains("£")) {
+		    priceStartIndex = priceStr.indexOf("£") + "£".length();
+			wellFormattedPrice = priceStr.substring(priceStartIndex).replace(".", "").replace(",", ".");
+		} else {
+			System.err.println("error: offerPriceFromString: unsupported input price string " + priceStr);
+			System.exit(1);
+		}
 		
 		return Double.valueOf(wellFormattedPrice);
 	}
