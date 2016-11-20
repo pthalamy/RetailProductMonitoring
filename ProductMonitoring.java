@@ -82,7 +82,7 @@ public class ProductMonitoring {
 		// Check cross-selling for each product
 		for (Product p : products) {
 			for (Offer o : p.offers) {
-				if (p.retailPrice > o.price) {
+				if (o.price < p.retailPrice - 5 ) {
 				    priceInconsistencyDetected = true;
 					reportPriceAnomaly(p, o);
 				}					
