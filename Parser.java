@@ -30,8 +30,9 @@ public class Parser {
 			// Get missing product information and initialize product
 			Elements h1 = doc.getElementsByTag("h1");
 			if (h1.isEmpty()) {
-				System.err.println("error: parsing is currently blocked by the Amazon Servers, please change your ip address");
-				System.exit(1);
+				System.err.println("error: parsing is currently blocked by the Amazon Servers, please change your ip address."
+								   + " Or product does not exist at url: " + url);
+				return null;
 			}
 			
 			String productName = h1.first().text();
@@ -89,7 +90,7 @@ public class Parser {
 			if (expFromString.equals("")) {
 				Elements fulfilledByAmazon = offer.getElementsByClass("a-popover-trigger a-declarative olpFbaPopoverTrigger");
 				if (fulfilledByAmazon.isEmpty()) {
-					System.err.println("error: Missing dispatch information!" + "\n\turl: " + url);
+					System.err.println("error: Missing dispatch information!" + " url: " + url);
 					expeditionCountry  = Country.OTHER;
 				} else {
 					// Product is shipped by Amazon
