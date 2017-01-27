@@ -13,6 +13,11 @@ public class ProductMonitoring {
 		HashMap<String, Brand> brands = readBrandsFromCSVFile(brandCSV);
 		HashMap<String, Product> products = readProductsFromCSVFile(productsCSV, brands);
 
+		if (brands == null || products == null) {
+			System.err.println("error: Parsing failed, check CSV files.");
+			System.exit(1);
+		}
+		
 		// for (Country country : Country.values()) {
 		// 	if (!country.equals(Country.OTHER)) {
 		// 		System.out.println("\n=> Parsing data for country: " + country);
@@ -37,7 +42,7 @@ public class ProductMonitoring {
 
 		// 		// printAllProducts(products);
 		
-		// 		if (performCrossSellingCheck(products))
+		// 		if (performCrossSellingCheck(products, country))
 		// 			System.out.println("Cross-selling detected, check above.");
 		// 		else
 		// 			System.out.println("NO cross-selling detected.");
@@ -56,21 +61,25 @@ public class ProductMonitoring {
 	}
 
 	// Return true if a cross selling offer was detected, false otherwise
-	public static boolean performCrossSellingCheck(ArrayList<Product> products) {
+	public static boolean performCrossSellingCheck(ArrayList<Product> products, Country store) {
 		boolean CSDetected = false;
 			
 		// Check cross-selling for each product
 		for (Product p : products) {
 			for (Offer o : p.offers) {
 				if (!p.country.equals(o.country)) {
+                                 // Ignore if not on Italian store, and offer not from Italy
+					if (store.equals(Country.ITALY) || o.country.equals(Country.ITALY)) {
 				    CSDetected = true;
 					reportCS(p, o);
+					}
 				}					
 			}
 		}
 
 		return CSDetected;
 	}
+
 
 	// Return true if a price inconsistency was detected, false otherwise
 	public static boolean performPriceCheck(ArrayList<Product> products) {
@@ -79,7 +88,7 @@ public class ProductMonitoring {
 		// Check cross-selling for each product
 		for (Product p : products) {
 			for (Offer o : p.offers) {
-				if (o.price < p.retailPrice - 5 ) {
+				if (o.price < p.retailPrice - 5 ) {                 //this is price check, not cs
 				    priceInconsistencyDetected = true;
 					reportPriceAnomaly(p, o);
 				}					
@@ -125,13 +134,15 @@ public class ProductMonitoring {
                 String[] product = line.split(cvsSplitBy);
 
 				// PRODUCT FORMAT: [BRAND, PRODUCTNAME, PRICE, ASIN]
-                System.out.println("Product " +
-								   " [" + product[0] +
-								   ", " + product[1] +
-								   ", " + product[2] +
-								   ", " + product[3]
-								   + "]");
+                // System.out.println("Product " +
+				// 				   " [" + product[0] +
+				// 				   ", " + product[1] +
+				// 				   ", " + product[2] +
+				// 				   ", " + product[3]
+				// 				   + "]");
 				// CREATE PROD
+				products.put(product[3], new Product(product[1], brands.get(product[0]),
+													 Double.parseDouble(product[2]), product[3]));
             }
 
         } catch (FileNotFoundException e) {
@@ -148,7 +159,7 @@ public class ProductMonitoring {
             }
         }
 
-		return null;
+		return products;
 	}
 
 	public static HashMap<String, Brand> readBrandsFromCSVFile(String csvFile) {
@@ -166,11 +177,12 @@ public class ProductMonitoring {
                 String[] brand = line.split(cvsSplitBy);
 
 				// BRAND FORMAT: [BRANDNAME, AUTHORIZEDDISCOUNT]
-                System.out.println("BRAND " +
-								   " [" + brand[1] +
-								   ", " + brand[2] 
-								   + "]");
+                // System.out.println("BRAND " +
+				// 				   " [" + brand[0] +
+				// 				   ", " + brand[1] 
+				// 				   + "]");
 				// CREATE BRAND
+				brands.put(brand[0], new Brand(brand[0], Double.parseDouble(brand[1])));
             }
 
         } catch (FileNotFoundException e) {
@@ -187,7 +199,7 @@ public class ProductMonitoring {
             }
         }
 
-		return null;
+		return brands;
 	}
 
 }
